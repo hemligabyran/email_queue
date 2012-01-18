@@ -1,0 +1,6 @@
+Email queue system for Pajas
+Requires:
+* Kohana v3.2 (kohanaframework.org)
+and modules:
+* Pajas (https://github.com/lillem4n/kohana-module-pajas)
+* Email (https://github.com/shadowhand/email)
