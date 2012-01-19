@@ -24,9 +24,9 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 					'subject',
 					'body',
 					'attachments',
-					'date_queued',
-					'date_sent',
-					'date_last_attempt'
+					'queued',
+					'sent',
+					'last_attempt'
 				)) return TRUE;
 		}
 
@@ -45,9 +45,9 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 			`subject` varchar(255) DEFAULT NULL,
 			`body` text NOT NULL,
 			`attachments` text,
-			`date_queued` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			`date_sent` timestamp,
-			`date_last_attempt` timestamp,
+			`queued` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			`sent` timestamp,
+			`last_attempt` timestamp,
 			PRIMARY KEY (`id`),
 			KEY `status` (`status`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;');
@@ -75,7 +75,7 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		$statuses  = array();
 		$failed    = array();
 		$successed = array();
-		$mails     = $this->pdo->query('SELECT * FROM email_queue WHERE status = \'queue\' ORDER BY date_queued LIMIT '.intval($amount).';')->fetchAll(PDO::FETCH_ASSOC);
+		$mails     = $this->pdo->query('SELECT * FROM email_queue WHERE status = \'queue\' ORDER BY queued LIMIT '.intval($amount).';')->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($mails as $mail)
 		{
 			$mail_response = (bool) Email::factory($mail['subject'], $mail['body'])
@@ -96,8 +96,8 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 
 		}
 
-		if (count($failed))    $this->pdo->query('UPDATE email_queue SET status = \'failed\', attempts = attempts + 1, date_last_attempt = NOW() WHERE id IN ('.implode(',',$failed).');');
-		if (count($successed)) $this->pdo->query('UPDATE email_queue SET status = \'sent\',   attempts = attempts + 1, date_last_attempt = NOW(), date_sent = NOW() WHERE id IN ('.implode(',',$successed).');');
+		if (count($failed))    $this->pdo->query('UPDATE email_queue SET status = \'failed\', attempts = attempts + 1, last_attempt = NOW() WHERE id IN ('.implode(',',$failed).');');
+		if (count($successed)) $this->pdo->query('UPDATE email_queue SET status = \'sent\',   attempts = attempts + 1, last_attempt = NOW(), `sent` = NOW() WHERE id IN ('.implode(',',$successed).');');
 
 		return $statuses;
 	}

@@ -7,10 +7,11 @@ class Controller_Sendemails extends Controller
 	{
 		header('Content-Type: text/plain');
 		$emailqueue = new Emailqueue;
-//		echo 'Added: '.$emailqueue->add('hurbel@yahoo.com', 'Liten body', 'litet subject');
-		print_r($emailqueue->send());
-		echo "\n";
-		echo "All done";
+		foreach ($emailqueue->send() as $mail)
+		{
+			echo 'ID: '.$mail['id'].' Status: '.$mail['status'].' Email: '.$mail['email']."\n";
+		}
+		die("\n".'End');
 	}
 
 }
