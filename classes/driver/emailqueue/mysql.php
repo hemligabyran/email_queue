@@ -78,7 +78,7 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		$mails     = $this->pdo->query('SELECT * FROM email_queue WHERE status = \'queue\' ORDER BY queued LIMIT '.intval($amount).';')->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($mails as $mail)
 		{
-			$mail_response = (bool) Email::factory($mail['subject'], $mail['body'])
+			$mail_response = (bool) Email::factory($mail['subject'], $mail['body'], 'text/html')
 				->to($mail['to_email'], $mail['to_name'])
 				->from($mail['from_email'], $mail['from_name'])
 				->send($errors);
