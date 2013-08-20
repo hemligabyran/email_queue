@@ -28,6 +28,11 @@ class Emailqueue
 		return self::$driver;
 	}
 
+	public static function factory()
+	{
+		return new self();
+	}
+
 	// For docs, see classes/driver/emailqueue.php
 	public function add($to_email, $body, $subject = NULL, $to_name = NULL, $attachments = NULL, $from_email = NULL, $from_name = NULL)
 	{
