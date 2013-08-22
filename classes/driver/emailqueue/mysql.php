@@ -53,19 +53,38 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;');
 	}
 
-	public function add($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name)
+	public function add($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name, $send_directly)
 	{
 		if ( ! self::$prepared_insert)
 		{
-			$sql = 'INSERT INTO email_queue (to_email, body, subject, to_name, attachments, from_email, from_name) VALUES(?,?,?,?,?,?,?);';
+			$sql = 'INSERT INTO email_queue (to_email, body, subject, to_name, attachments, from_email, from_name, status) VALUES(?,?,?,?,?,?,?,?);';
 
 			self::$prepared_insert = $this->pdo->prepare($sql);
 		}
 
 		if (Valid::email($to_email) && Valid::email($from_email))
 		{
-			self::$prepared_insert->execute(array($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name));
-			return $this->pdo->lastInsertId();
+			if ($send_directly) $status = 'sent';
+			else                $status = 'queue';
+
+			self::$prepared_insert->execute(array($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name, $status));
+
+			$email_id = $this->pdo->lastInsertId();
+
+			if ($send_directly)
+			{
+				$mail_response = (bool) Email::factory($subject, $body, 'text/html')
+					->to($to_email, $to_name)
+					->from($from_email, $from_name)
+					->send($errors);
+
+				if ($mail_response)
+					$this->pdo->exec('UPDATE email_queue SET attempts = attempts + 1, last_attempt = NOW(), `sent` = NOW() WHERE id  = '.$this->pdo->quote($email_id).');');
+				else
+					$this->pdo->exec('UPDATE email_queue SET status = \'failed\', attempts = attempts + 1, last_attempt = NOW() WHERE id  = '.$this->pdo->quote($email_id).');');
+			}
+
+			return $email_id;
 		}
 		else return FALSE;
 	}

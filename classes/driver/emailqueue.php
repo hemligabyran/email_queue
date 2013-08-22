@@ -35,14 +35,15 @@ abstract class Driver_Emailqueue extends Model
 	 *
 	 * @param str $to_email
 	 * @param str $body
-	 * @param str $subject      OPTIONAL
-	 * @param str $to_name      OPTIONAL
-	 * @param str $attachments  OPTIONAL BASE64!!!
-	 * @param str $from_email   OPTIONAL - Will use setting in config file if not supplied
-	 * @param str $from_name    OPTIONAL - Will use setting in config file if not supplied
+	 * @param str $subject         OPTIONAL
+	 * @param str $to_name         OPTIONAL
+	 * @param str $attachments     OPTIONAL BASE64!!!
+	 * @param str $from_email      OPTIONAL - Will use setting in config file if not supplied
+	 * @param str $from_name       OPTIONAL - Will use setting in config file if not supplied
+	 * @param bool $send_directly  If set to true, will send on the double and just add the record to queue that its sent
 	 * @return int ID in database
 	 */
-	abstract public function add($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name);
+	abstract public function add($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name, $send_directly);
 
 	/**
 	 * Send emails from the queue

@@ -34,12 +34,12 @@ class Emailqueue
 	}
 
 	// For docs, see classes/driver/emailqueue.php
-	public function add($to_email, $body, $subject = NULL, $to_name = NULL, $attachments = NULL, $from_email = NULL, $from_name = NULL)
+	public function add($to_email, $body, $subject = NULL, $to_name = NULL, $attachments = NULL, $from_email = NULL, $from_name = NULL, $send_directly = FALSE)
 	{
 		if ( ! $from_email) $from_email = Kohana::$config->load('emailqueue.from_email');
 		if ( ! $from_name)  $from_name  = Kohana::$config->load('emailqueue.from_name');
 
-		return self::driver()->add($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name);
+		return self::driver()->add($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name, $send_directly);
 	}
 
 	public function send($amount = 5)
