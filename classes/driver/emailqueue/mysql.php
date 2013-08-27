@@ -79,9 +79,9 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 					->send($errors);
 
 				if ($mail_response)
-					$this->pdo->exec('UPDATE email_queue SET attempts = attempts + 1, last_attempt = NOW(), `sent` = NOW() WHERE id  = '.$this->pdo->quote($email_id).');');
+					$this->pdo->exec('UPDATE email_queue SET attempts = attempts + 1, last_attempt = NOW(), `sent` = NOW() WHERE id  = '.$this->pdo->quote($email_id));
 				else
-					$this->pdo->exec('UPDATE email_queue SET status = \'failed\', attempts = attempts + 1, last_attempt = NOW() WHERE id  = '.$this->pdo->quote($email_id).');');
+					$this->pdo->exec('UPDATE email_queue SET status = \'failed\', attempts = attempts + 1, last_attempt = NOW() WHERE id  = '.$this->pdo->quote($email_id));
 			}
 
 			return $email_id;
@@ -94,6 +94,7 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		$statuses  = array();
 		$failed    = array();
 		$successed = array();
+		$this->pdo->exec('LOCK TABLES email_queue WRITE');
 		$mails     = $this->pdo->query('SELECT * FROM email_queue WHERE status = \'queue\' ORDER BY queued LIMIT '.intval($amount).';')->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($mails as $mail)
 		{
@@ -117,6 +118,8 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 
 		if (count($failed))    $this->pdo->query('UPDATE email_queue SET status = \'failed\', attempts = attempts + 1, last_attempt = NOW() WHERE id IN ('.implode(',',$failed).');');
 		if (count($successed)) $this->pdo->query('UPDATE email_queue SET status = \'sent\',   attempts = attempts + 1, last_attempt = NOW(), `sent` = NOW() WHERE id IN ('.implode(',',$successed).');');
+
+		$this->pdo->exec('UNLOCK TABLES');
 
 		return $statuses;
 	}
