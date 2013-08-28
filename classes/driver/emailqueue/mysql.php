@@ -124,4 +124,49 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		return $statuses;
 	}
 
+	public function get_emails($id=NULL, $limit=NULL, $offset=NULL)
+	{
+		$emails = array();
+
+		$sql = 'SELECT * from email_queue WHERE 1=1';
+
+		if ($id!=NULL)
+		{
+			$sql.=' AND id = '.$this->pdo->quote($id);
+		}
+		else
+		{
+			if ($limit !== NULL && $offset !== NULL)
+			{
+				$sql.=' LIMIT '.$offset.','.$limit;
+			}
+		}
+
+		$query = $this->pdo->query($sql);
+
+		foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row)
+		{
+			$emails[$row['id']] = $row;
+		}
+		
+		return $emails;
+	}
+
+
+	public function get_count_emails()
+	{
+		$emails = 0;
+
+		$sql = 'SELECT count(*) as count from email_queue WHERE 1=1';
+
+		$query = $this->pdo->query($sql);
+
+		foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row)
+		{
+			$emails = intval($row['count']);
+		}
+
+		return $emails;
+	}
+
 }
