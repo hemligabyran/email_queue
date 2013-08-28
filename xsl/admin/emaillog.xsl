@@ -54,10 +54,10 @@
 				<ul class="pagination">
 					<li class="previous">
 						<xsl:if test="/root/content/mails_meta/actual_page = 1">
-							<strong>‹ Previous</strong>
+							<strong>‹ Föregående sida</strong>
 						</xsl:if>
 						<xsl:if test="/root/content/mails_meta/actual_page &gt; 1">
-							<a href="/admin/emaillog?page={/root/content/mails_meta/actual_page -1}">‹ Previous</a>
+							<a href="/admin/emaillog?page={/root/content/mails_meta/actual_page -1}">‹ Föregående sida</a>
 						</xsl:if>
 					</li>
 					<xsl:if test="/root/content/mails_meta/actual_page &gt; 5">
@@ -106,10 +106,10 @@
 					</xsl:if>
 					<li class="next">
 						<xsl:if test="/root/content/mails_meta/pages = /root/content/mails_meta/actual_page">
-							<strong>Next ›</strong>
+							<strong>Nästa sida ›</strong>
 						</xsl:if>
 						<xsl:if test="/root/content/mails_meta/pages != /root/content/mails_meta/actual_page">
-							<a href="/admin/emaillog?page={/root/content/mails_meta/actual_page +1}">Next ›</a>
+							<a href="/admin/emaillog?page={/root/content/mails_meta/actual_page +1}">Nästa sida ›</a>
 						</xsl:if>
 					</li>
 				</ul>
