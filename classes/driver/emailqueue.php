@@ -53,4 +53,16 @@ abstract class Driver_Emailqueue extends Model
 	 */
 	abstract public function send($amount);
 
+
+	/**
+	 * Get one or all the emails
+	 *
+	 * @param int $id - the id of the mail to get just one if NULL then will return all
+	 * @param int $limit - the limit for the query. If we are asking for just one this should be NULL.
+	 * @param int $offset - the offset for the query. If we are asking for just one this should be NULL.
+	 */
+	abstract public function get_emails($id=NULL, $limit=NULL, $offset=NULL);
+
+	abstract public function get_count_emails();
+
 }
