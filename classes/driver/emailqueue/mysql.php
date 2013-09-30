@@ -67,7 +67,7 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 			if ($send_directly) $status = 'sent';
 			else                $status = 'queue';
 
-			self::$prepared_insert->execute(array($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name, $status));
+			self::$prepared_insert->execute(array($to_email, $body, $subject, $to_name, serialize($attachments), $from_email, $from_name, $status));
 
 			$email_id = $this->pdo->lastInsertId();
 
@@ -98,10 +98,16 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		$mails     = $this->pdo->query('SELECT * FROM email_queue WHERE status = \'queue\' ORDER BY queued LIMIT '.intval($amount).';')->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($mails as $mail)
 		{
-			$mail_response = (bool) Email::factory($mail['subject'], $mail['body'], 'text/html')
+			$email_instance = Email::factory($mail['subject'], $mail['body'], 'text/html')
 				->to($mail['to_email'], $mail['to_name'])
-				->from($mail['from_email'], $mail['from_name'])
-				->send($errors);
+				->from($mail['from_email'], $mail['from_name']);
+
+			if ($mail['attachments'] != '' && unserialize($mail['attachments']))
+				foreach (unserialize($mail['attachments']) as $attachment)
+					if (file_exists($attachment))
+						$email_instance->attach_content(file_get_contents($attachment), pathinfo($attachment, PATHINFO_BASENAME));
+
+			$mail_response = (bool) $email_instance->send($errors);
 
 			if ($mail_response)
 			{
@@ -148,7 +154,7 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		{
 			$emails[$row['id']] = $row;
 		}
-		
+
 		return $emails;
 	}
 
