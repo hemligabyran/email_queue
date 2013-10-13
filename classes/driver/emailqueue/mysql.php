@@ -73,10 +73,16 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 
 			if ($send_directly)
 			{
-				$mail_response = (bool) Email::factory($subject, $body, 'text/html')
+				$email_instance = Email::factory($subject, $body, 'text/html')
 					->to($to_email, $to_name)
-					->from($from_email, $from_name)
-					->send($errors);
+					->from($from_email, $from_name);
+
+				if ($attachments && $attachments != '')
+					foreach ($attachments as $attachment)
+						if (file_exists($attachment))
+							$email_instance->attach_content(file_get_contents($attachment), pathinfo($attachment, PATHINFO_BASENAME));
+
+				$mail_response = (bool) $email_instance->send($errors);
 
 				if ($mail_response)
 					$this->pdo->exec('UPDATE email_queue SET attempts = attempts + 1, last_attempt = NOW(), `sent` = NOW() WHERE id  = '.$this->pdo->quote($email_id));
