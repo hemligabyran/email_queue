@@ -25,6 +25,15 @@ class Emailqueuelog extends Model
 		return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	public function get_count()
+	{
+		$sql = 'SELECT COUNT(id) FROM email_queue WHERE 1';
+
+		if ($this->ids) $sql .= ' AND id IN ('.implode(',', $this->ids).')';
+
+		return $this->pdo->query($sql)->fetchColumn();
+	}
+
 	public function ids($array = NULL)
 	{
 		if ($array === NULL) $this->ids = NULL;
