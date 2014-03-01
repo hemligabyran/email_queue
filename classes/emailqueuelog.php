@@ -6,12 +6,24 @@ class Emailqueuelog extends Model
 	protected $ids;
 	protected $limit = 100;
 	protected $offset;
+	protected $search;
 
 	public function get()
 	{
 		$sql = 'SELECT * FROM email_queue WHERE 1';
 
-		if ($this->ids) $sql .= ' AND id IN ('.implode(',', $this->ids).')';
+		if ($this->ids)    $sql .= ' AND id IN ('.implode(',', $this->ids).')';
+		if ($this->search) $sql .= ' AND (
+				   to_email     LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR to_name      LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR from_email   LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR from_name    LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR subject      LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR body         LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR queued       LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR sent         LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR last_attempt LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+			)';
 
 		$sql .= ' ORDER BY queued DESC';
 
@@ -29,7 +41,18 @@ class Emailqueuelog extends Model
 	{
 		$sql = 'SELECT COUNT(id) FROM email_queue WHERE 1';
 
-		if ($this->ids) $sql .= ' AND id IN ('.implode(',', $this->ids).')';
+		if ($this->ids)    $sql .= ' AND id IN ('.implode(',', $this->ids).')';
+		if ($this->search) $sql .= ' AND (
+				   to_email     LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR to_name      LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR from_email   LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR from_name    LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR subject      LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR body         LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR queued       LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR sent         LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+				OR last_attempt LIKE '.$this->pdo->quote('%'.$this->search.'%').'
+			)';
 
 		return $this->pdo->query($sql)->fetchColumn();
 	}
@@ -69,6 +92,14 @@ class Emailqueuelog extends Model
 			$this->offset = preg_replace('/[^0-9]+/', '', $num);
 			if ($this->offset == '') $this->offset = NULL; // No limit found
 		}
+
+		return $this;
+	}
+
+	public function search($string)
+	{
+		if ($string === NULL) $this->search = NULL;
+		else                  $this->search = (string) $string;
 
 		return $this;
 	}

@@ -47,7 +47,7 @@ class Emailqueue
 		return self::driver()->send($amount);
 	}
 
-	public function get_emails($id=NULL, $limit=NULL, $offset=NULL)
+	public function get_emails($id = NULL, $limit = NULL, $offset = NULL)
 	{
 		return self::driver()->get_emails($id, $limit, $offset);
 	}
@@ -56,6 +56,5 @@ class Emailqueue
 	{
 		return self::driver()->get_count_emails();
 	}
-
 
 }
