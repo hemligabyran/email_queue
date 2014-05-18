@@ -64,6 +64,9 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 
 		if (Valid::email($to_email) && Valid::email($from_email))
 		{
+			if ( ! Kohana::$config->load('emailqueue.allow_direct_send'))
+				$send_directly = FALSE;
+
 			if ($send_directly) $status = 'sent';
 			else                $status = 'queue';
 
