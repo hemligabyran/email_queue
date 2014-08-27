@@ -8,9 +8,8 @@ class Controller_Sendemails extends Controller
 		header('Content-Type: text/plain');
 		$emailqueue = new Emailqueue;
 		foreach ($emailqueue->send() as $mail)
-		{
 			echo 'ID: '.$mail['id'].' Status: '.$mail['status'].' Email: '.$mail['email']."\n";
-		}
+
 		die("\n".'End');
 	}
 

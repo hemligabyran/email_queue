@@ -8,8 +8,9 @@ And have it commented out while developing.
 
 return array(
 //	'driver' => 'mysql',
-	'driver'            => Kohana::$config->load('pdo.default.driver'),
-	'from_email'        => 'no@one.nu',
-	'from_name'         => 'Nobody',
-	'allow_direct_send' => (Kohana::$environment == Kohana::PRODUCTION),
+	'driver'              => Kohana::$config->load('pdo.default.driver'),
+	'from_email'          => 'no@one.nu',
+	'from_name'           => 'Nobody',
+	'allow_direct_send'   => (Kohana::$environment == Kohana::PRODUCTION),
+	'allowed_test_emails' => array('test@test.com'),
 );

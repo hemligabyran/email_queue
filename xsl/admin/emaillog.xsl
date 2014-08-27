@@ -6,8 +6,8 @@
 	<xsl:template name="tabs">
 		<ul class="tabs">
 			<xsl:call-template name="tab">
-				<xsl:with-param name="href"      select="'emaillog'" />
-				<xsl:with-param name="text"      select="'Email log'" />
+				<xsl:with-param name="href" select="'emaillog'" />
+				<xsl:with-param name="text" select="'Email log'" />
 			</xsl:call-template>
 		</ul>
 	</xsl:template>

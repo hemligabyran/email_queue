@@ -6,13 +6,9 @@ abstract class Driver_Emailqueue extends Model
 	public function __construct()
 	{
 		parent::__construct();
-		if (Kohana::$environment == Kohana::DEVELOPMENT)
-		{
-			if ( ! $this->check_db_structure())
-			{
-				$this->create_db_structure();
-			}
-		}
+
+		if (Kohana::$environment == Kohana::DEVELOPMENT && ! $this->check_db_structure())
+			$this->create_db_structure();
 	}
 
 	/**
@@ -46,13 +42,11 @@ abstract class Driver_Emailqueue extends Model
 	abstract public function add($to_email, $body, $subject, $to_name, $attachments, $from_email, $from_name, $send_directly);
 
 	/**
-	 * Send emails from the queue
+	 * Get
 	 *
-	 * @param int $amount - amount of emails to send. Dont set this to high. Maybe 5-10 is good
-	 * @return array with sucesses
-	 */
-	abstract public function send($amount);
-
+	 * @var string
+	 **/
+	abstract public function get_count_emails();
 
 	/**
 	 * Get one or all the emails
@@ -61,8 +55,14 @@ abstract class Driver_Emailqueue extends Model
 	 * @param int $limit - the limit for the query. If we are asking for just one this should be NULL.
 	 * @param int $offset - the offset for the query. If we are asking for just one this should be NULL.
 	 */
-	abstract public function get_emails($id=NULL, $limit=NULL, $offset=NULL);
+	abstract public function get_emails($id = NULL, $limit = NULL, $offset = NULL);
 
-	abstract public function get_count_emails();
+	/**
+	 * Send emails from the queue
+	 *
+	 * @param int $amount - amount of emails to send. Dont set this to high. Maybe 5-10 is good
+	 * @return array with sucesses
+	 */
+	abstract public function send($amount);
 
 }

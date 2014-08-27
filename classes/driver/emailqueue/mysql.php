@@ -33,7 +33,8 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		return FALSE;
 	}
 
-	protected function create_db_structure() {
+	protected function create_db_structure()
+	{
 		return $this->pdo->query('CREATE TABLE IF NOT EXISTS `email_queue` (
 			`id` bigint(20) NOT NULL AUTO_INCREMENT,
 			`status` enum(\'queue\',\'sent\',\'failed\') DEFAULT \'queue\',
@@ -98,6 +99,39 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 		else return FALSE;
 	}
 
+	public function get_count_emails()
+	{
+		$emails = 0;
+
+		$sql = 'SELECT COUNT(*) AS count FROM email_queue WHERE 1 = 1';
+
+		$query = $this->pdo->query($sql);
+
+		foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row)
+			$emails = intval($row['count']);
+
+		return $emails;
+	}
+
+	public function get_emails($id = NULL, $limit = NULL, $offset = NULL)
+	{
+		$emails = array();
+
+		$sql = 'SELECT * from email_queue WHERE 1=1';
+
+		if ($id!=NULL)
+			$sql.=' AND id = '.$this->pdo->quote($id);
+		elseif ($limit !== NULL && $offset !== NULL)
+			$sql.=' LIMIT '.$offset.','.$limit;
+
+		$query = $this->pdo->query($sql);
+
+		foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row)
+			$emails[$row['id']] = $row;
+
+		return $emails;
+	}
+
 	public function send($amount)
 	{
 		$statuses  = array();
@@ -131,57 +165,15 @@ class Driver_Emailqueue_Mysql extends Driver_Emailqueue
 
 		}
 
-		if (count($failed))    $this->pdo->query('UPDATE email_queue SET status = \'failed\', attempts = attempts + 1, last_attempt = NOW() WHERE id IN ('.implode(',',$failed).');');
-		if (count($successed)) $this->pdo->query('UPDATE email_queue SET status = \'sent\',   attempts = attempts + 1, last_attempt = NOW(), `sent` = NOW() WHERE id IN ('.implode(',',$successed).');');
+		if (count($failed))
+			$this->pdo->query('UPDATE email_queue SET status = \'failed\', attempts = attempts + 1, last_attempt = NOW() WHERE id IN ('.implode(',',$failed).');');
+
+		if (count($successed))
+			$this->pdo->query('UPDATE email_queue SET status = \'sent\', attempts = attempts + 1, last_attempt = NOW(), `sent` = NOW() WHERE id IN ('.implode(',',$successed).');');
 
 		$this->pdo->exec('UNLOCK TABLES');
 
 		return $statuses;
-	}
-
-	public function get_emails($id=NULL, $limit=NULL, $offset=NULL)
-	{
-		$emails = array();
-
-		$sql = 'SELECT * from email_queue WHERE 1=1';
-
-		if ($id!=NULL)
-		{
-			$sql.=' AND id = '.$this->pdo->quote($id);
-		}
-		else
-		{
-			if ($limit !== NULL && $offset !== NULL)
-			{
-				$sql.=' LIMIT '.$offset.','.$limit;
-			}
-		}
-
-		$query = $this->pdo->query($sql);
-
-		foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row)
-		{
-			$emails[$row['id']] = $row;
-		}
-
-		return $emails;
-	}
-
-
-	public function get_count_emails()
-	{
-		$emails = 0;
-
-		$sql = 'SELECT count(*) as count from email_queue WHERE 1=1';
-
-		$query = $this->pdo->query($sql);
-
-		foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row)
-		{
-			$emails = intval($row['count']);
-		}
-
-		return $emails;
 	}
 
 }
